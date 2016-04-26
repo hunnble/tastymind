@@ -1,0 +1,171 @@
+$hundred: 100px;
+$headerHeight: 60px;
+$navHeight: 20px;
+$white: #FFFFFF;
+$black: #000000;
+$sideBarBgColor: #F3FBD1;
+$taskBarBgColor: #F3FBD1;
+
+@mixin fullHeight {
+    position: absolute;
+    top: $headerHeight + $navHeight;
+    bottom: 0;
+    z-index: 99;
+}
+
+html, body {
+    font-size: 16px;
+    font-family: "SimHei", Arial;
+    height: 100%;
+}
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,
+form,fieldset,input,textarea,p,blockquote,th,td {
+    padding: 0;
+    margin: 0;
+}
+ol, ul {
+    list-style: none;
+}
+h1,h2,h3,h4,h5,h6 {
+    font-weight: normal;
+    font-size: 100%;
+}
+
+#contextmenu {
+    display: none;
+    position: absolute;
+    border: 1px solid $black;
+    width: $hundred;
+    z-index: 100;
+}
+#contextmenu>p {
+    line-height: $hundred / 4;
+    font-weight: bold;
+    cursor: pointer;
+}
+#contextmenu>p:hover, header {
+    background-color: $sideBarBgColor;
+    color: $white;
+}
+header {
+    height: $headerHeight;
+}
+nav {
+    border-top: 2px solid $black;
+    height: $navHeight;
+}
+nav>ul {
+    margin-left: 4 * $hundred;
+}
+nav li {
+    float: left;
+    width: 120px;
+    height: $navHeight;
+    line-height: $navHeight;
+    text-align: center;
+    cursor: pointer;
+}
+.options {
+    position: relative;
+    display: none;
+    z-index: 999;
+}
+.options p {
+    border: 1px solid $black;
+    border-top: 0;
+    margin-left: 10%;
+    width: 80%;
+    background-color: $white;
+    line-height: 30px;
+}
+#sideBar {
+    @include fullHeight;
+    top: 62px;
+    left: 0;
+    border-right: 2px solid $black;
+    width: 3 * $hundred;
+    background-color: $sideBarBgColor;
+}
+.chooseBar {
+    margin: 10px auto;
+    width: 2.8 * $hundred;
+}
+.chooseBar>ul>li {
+    display: inline-block;
+    border: 1px solid $black;
+    border-top-right-radius: 5px;
+    border-top-left-radius: 5px;
+    margin-bottom: -1px;
+    width: $hundred / 2;
+    height: 20px;
+    text-align: center;
+    cursor: pointer;
+}
+.chooseBar>ul>li.currentChoose {
+    border-bottom-color: $sideBarBgColor;
+}
+.chooseBar>div {
+    display: none;
+}
+.chooseBar>div.currentChoose {
+    display: block;
+}
+.chooseBar>div {
+    border: 1px solid $black;
+    width: 2.8 * $hundred;
+    height: 2 * $hundred;
+}
+#essential li {
+    margin: 5px;
+    font-size: 14px;
+}
+#essential p {
+    padding-left: 36px;
+    font-size: 12px;
+}
+#taskBar {
+    @include fullHeight;
+    left: 3 * $hundred;
+    right: 0;
+    border: 2px solid $black;
+    background-color: $taskBarBgColor;
+    opacity: .8;
+}
+.task {
+    position: absolute;
+    border-radius: 5px;
+    width: $hundred;
+    height: .4 * $hundred;
+    line-height: .4 * $hundred;
+    background-color: $black;
+    color: $white;
+    text-align: center;
+}
+.focusTask {
+    outline: none;
+    background-color: #F7E105;
+}
+#tmindCanvas {
+    @include fullHeight;
+    left: 3 * $hundred;
+    z-index: 9;
+}
+.alertWindow {
+    border: 1px solid $black;
+    background-color: $white;
+    color: $black;
+    font-family: 'Microsoft YaHei';
+}
+.alertWindowTitle {
+    font-size: 24px;
+    line-height: 30px;
+    text-indent: 16px;
+}
+.alertWindowContent {
+    padding: 16px;
+    font-size: 16px;
+}
+.alertWindowShader {
+    position: absolute;
+    z-index: 1000;
+}

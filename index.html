@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>tmind在线思维导图</title>
+    <link rel="stylesheet" href="./src/css/style.css">
+</head>
+<body>
+    <header></header>
+    <nav>
+        <ul>
+            <li>文档
+                <div class="options">
+                    <p>新建导图</p>
+                    <p>打开</p>
+                    <p>保存</p>
+                </div>
+            </li>
+            <li>编辑
+                <div class="options">
+                    <p>选择</p>
+                </div>
+            </li>
+            <li>插入
+                <div class="options">
+                    <p>主题</p>
+                    <p>其它</p>
+                </div>
+            </li>
+            <li>工具
+                <div class="options">
+                    <p>画笔</p>
+                    <p>色板</p>
+                    <p>其它</p>
+                </div>
+            </li>
+            <li>关于
+                <div class="options">
+                    <p>tmind</p>
+                    <p>帮助</p>
+                    <p>关于</p>
+                </div>
+            </li>
+        </ul>
+    </nav>
+    <aside id="sideBar">
+        <div class="chooseBar">
+            <ul>
+                <li class="currentChoose">大纲</li>
+                <li>浏览</li>
+            </ul>
+            <div id="essential" class="currentChoose">
+                <ul></ul>
+            </div>
+            <div id="browse">
+                <p>浏览</p>
+            </div>
+        </div>
+        <div class="chooseBar">
+            <ul>
+                <li class="currentChoose">属性</li>
+                <li>图标</li>
+            </ul>
+            <div id="attributes" class="currentChoose">
+                <p>属性</p>
+            </div>
+            <div id="icons">
+                <p>图标</p>
+            </div>
+        </div>
+    </aside>
+    <article>
+        <div id="taskBar"></div>
+        <canvas id="tmindCanvas"></canvas>
+        <div id="contextmenu">
+            <p>创建子主题</p>
+            <p>编辑此主题</p>
+            <p>删除此主题</p>
+            <p>保存</p>
+        </div>
+    </article>
+    <script src="./src/js/util.js"></script>
+    <script src="./src/js/Hum.js"></script>
+    <script src="./src/js/alertBar.js"></script>
+    <script src="./src/js/main.js"></script>
+</body>
+</html>
