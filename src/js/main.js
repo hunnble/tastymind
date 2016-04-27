@@ -110,14 +110,20 @@ Nav.prototype = {
                 hasShader: false,
                 isShow: true,
                 width: 400,
-                height: 400,
+                height: 300,
                 drag: false,
                 flexible: false,
+                btns: {
+                    1: '确认',
+                    2: '取消'
+                },
+                returnValues: ['1', '0'],
                 className: {
                     alertWindow: 'alertWindow',
                     title: 'alertWindowTitle',
                     content: 'alertWindowContent',
-                    shader: 'alertWindowShader'
+                    shader: 'alertWindowShader',
+                    btn: 'alertWindowBtn'
                 }
             };
 
@@ -132,18 +138,17 @@ Nav.prototype = {
                 config.contentTxt = '作者: hunnble';
             }
 
-            AlertComp = Hum.createClass(AlertBar, config).render();
+            AlertComp = Hum.createClass(AlertBar, config);
+            realDOM   = AlertComp.render();
 
             if(document.body) {
-                Hum.render(
-                    AlertComp,
-                    document.body
-                )
+                Hum.render(realDOM, document.body, function () {
+                    console.log(AlertComp.returnValue);
+                });
             } else {
-                Hum.render(
-                    AlertComp,
-                    document.documentElement
-                )
+                Hum.render(realDOM, document.documentElement, function () {
+                    console.log(AlertComp.returnValue);
+                });
             }
 
         });
@@ -216,7 +221,7 @@ function TaskBar () {
     this.canvas      = document.querySelector('#tmindCanvas');
     this.lineColor   = '#82ECA0';
     this.fillColor   = '#000000';
-    this.ratio       = 0.2;
+    this.ratio       = 0.8;
     this.contextmenu = new Contextmenu();
     this.sideBar;
     this.tasks       = [];
@@ -410,14 +415,13 @@ TaskBar.prototype = {
                 }
             };
             self.tasks.push(desNode);
-            // counts = -1;
-            // for(j = 0; j < i; ++j) {
-            //     if(self.tasks[j].parentIndex == -1) {
-            //         ++counts;
-            //     }
-            // }
 
-            counts = findBasicTask(self.tasks.length - 1, self.tasks)
+            counts = -1;
+            for(j = 0; j <= i; ++j) {
+                if(self.tasks[j].parentIndex == -1) {
+                    ++counts;
+                }
+            }
 
             treeNode = document.createElement('p');
             treeNode.innerHTML = task.innerHTML;
@@ -487,7 +491,7 @@ TaskBar.prototype = {
                                 }
                             }
                         }
-                        for(len = -1; j < i; ++j) {
+                        for(len = -1, j = 0; j < i; ++j) {
                             if(self.tasks[j].parentIndex == -1) {
                                 ++len;
                             }
@@ -499,7 +503,15 @@ TaskBar.prototype = {
                                 ++counts;
                             }
                         }
+
                         taskTree.removeChild(treeNodes[counts]);
+
+                        // 删除taskBar和tasks中被删除节点的所有子节点
+                        // for(j = i + 1; j < len; ++j) {
+                        //     if(findBasicTask(j, self.tasks) == parentIndex) {
+                        //         ++counts;
+                        //     }
+                        // }
                     }
 
                     // 子节点从DOM中和tasks中删除
@@ -518,7 +530,9 @@ TaskBar.prototype = {
 
             // 子主题重定向
             for(j = 0, len = self.tasks.length; j < len; ++j) {
-                if(self.tasks[j].parentIndex >= i) {
+                if(j >= i && self.tasks[j].parentIndex == parentIndex) {
+                    self.tasks[j].parentIndex = -1;
+                } else if(self.tasks[j].parentIndex >= i) {
                     self.tasks[j].parentIndex -= 1;
                 }
             }
@@ -545,13 +559,36 @@ TaskBar.prototype = {
     },
     // 绘制主题间的连线
     drawBezierCurve: function (e, ratio, lastTask) {
-        var self  = this,
-            cxt   = self.canvas.getContext('2d'),
-            lastX = lastTask.offsetLeft + lastTask.offsetWidth / 2,
-            lastY = lastTask.offsetTop + lastTask.offsetHeight / 2,
-            newX  = e.clientX - self.taskBar.offsetLeft,
-            newY  = e.clientY - self.taskBar.offsetTop,
-            diff  = {
+        var self       = this,
+            cxt        = self.canvas.getContext('2d'),
+            taskWidth  = lastTask.offsetWidth,
+            taskHeight = lastTask.offsetHeight,
+            lastX      = lastTask.offsetLeft + taskWidth / 2,
+            lastY      = lastTask.offsetTop + taskHeight / 2,
+            newX       = e.clientX - self.taskBar.offsetLeft,
+            newY       = e.clientY - self.taskBar.offsetTop,
+            diffX      = newX - lastX,
+            diffY      = newY - lastY;
+
+        if(diffX > -1 * taskWidth && diffX < taskWidth && diffY > -1 * taskHeight && diffY < taskHeight) {
+            return;
+        }
+        if(diffX > taskWidth) {
+            newX -= taskWidth / 2;
+            lastX += taskWidth / 2;
+        } else if (diffX < -1 * taskWidth) {
+            newX += taskWidth / 2;
+            lastX -= taskWidth / 2;
+        }
+        if(diffY > taskHeight) {
+            newY -= taskHeight / 2;
+            lastY += taskHeight / 2;
+        } else if (diffY < -1 * taskHeight) {
+            newY += taskHeight / 2;
+            lastY -= taskHeight / 2;
+        }
+
+        var diff  = {
                 x: newX - lastX,
                 y: newY - lastY
             },

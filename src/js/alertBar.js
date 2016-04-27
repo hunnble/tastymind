@@ -10,24 +10,28 @@ function AlertBar (config) {
         content: '',
         btns: {}
     };
-    this.titleTxt   = config.titleTxt || 'Default title';
-    this.contentTxt = config.contentTxt || 'Default content';
-    this.btnsTxt    = config.btns || {};
-    this.hasShader  = config.hasShader || false;
-    this.isShow     = config.isShow || false;
-    this.width      = config.width || 400;
-    this.height     = config.height || 300;
-    this.drag       = config.drag || false;
-    this.flexible   = config.flexible || false;
+    this.titleTxt     = config.titleTxt || 'Default title';
+    this.contentTxt   = config.contentTxt || 'Default content';
+    this.btnsTxt      = config.btns || {};
+    this.hasShader    = config.hasShader || false;
+    this.isShow       = config.isShow || false;
+    this.width        = config.width || 400;
+    this.height       = config.height || 300;
+    this.drag         = config.drag || false;
+    this.flexible     = config.flexible || false;
+    this.returnValues = config.returnValues || [];
 
     this.shader      = document.createElement('div');
     this.alertWindow = document.createElement('div');
     this.title       = document.createElement('h4');
     this.content     = document.createElement('p');
+    this.input       = document.createElement('input');
+    this.input.type  = 'text';
     this.btnBar      = document.createElement('div');
     this.btns        = [];
     this.startX      = 0;
     this.startY      = 0;
+    this.returnValue;
 
     this.bindEvents();
 };
@@ -40,17 +44,18 @@ AlertBar.prototype.render = function () {
         alertWindow = this.alertWindow,
         title       = this.title,
         content     = this.content,
+        input       = this.input,
         btnBar      = this.btnBar,
         btns        = this.btns,
         virtualDOM  = document.createElement('div');
 
-    shader.className             = this.className['shader'];
-    shader.style.width           = '100%';
-    shader.style.height          = document.body.offsetHeight + 'px';
-    shader.style.position        = 'absolute';
-    shader.style.top             = 0;
-    shader.style.left            = 0;
-    shader.style.display         = this.isShow ? 'block' : 'none';
+    shader.className      = this.className['shader'];
+    shader.style.width    = '100%';
+    shader.style.height   = document.body.offsetHeight + 'px';
+    shader.style.position = 'absolute';
+    shader.style.top      = 0;
+    shader.style.left     = 0;
+    shader.style.display  = this.isShow ? 'block' : 'none';
 
     if(!this.hasShader) {
         shader.style.backgroundColor = 'inherit';
@@ -112,6 +117,17 @@ AlertBar.prototype.bindEvents = function () {
 
         if(target === self.shader) {
             self.toggle();
+        }
+    });
+
+    addHandler(this.btnBar, 'click', function (e) {
+        var target = getTarget(e),
+            index  = -1;
+
+        if(hasClassName(target, self.className['btn'])) {
+            index = Array.prototype.indexOf.call(self.btnBar.querySelectorAll('div'), target);
+            self.toggle();
+            self.returnValue = self.returnValues[index];
         }
     });
 

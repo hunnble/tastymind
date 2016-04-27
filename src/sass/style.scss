@@ -115,13 +115,39 @@ nav li {
     width: 2.8 * $hundred;
     height: 2 * $hundred;
 }
-#essential li {
+#essential {
+    overflow: auto;
+}
+#essential li, #attributes li {
     margin: 5px;
     font-size: 14px;
 }
-#essential p {
+#essential p, #attributes li>p {
     padding-left: 36px;
     font-size: 12px;
+}
+.theme {
+    display: inline-block;
+    border: 5px solid;
+    width: 25px;
+    height: 25px;
+    cursor: pointer;
+}
+.theme.default {
+    border-color: $black;
+    background-color: $taskBarBgColor;
+}
+.theme.wolf {
+    border-color: $white;
+    background-color: #8C8282;
+}
+.theme.lion {
+    border-color: #F7F01B;
+    background-color: #8B1010;
+}
+.theme.crow {
+    border-color: $black;
+    background-color: $black;
 }
 #taskBar {
     @include fullHeight;
@@ -168,4 +194,14 @@ nav li {
 .alertWindowShader {
     position: absolute;
     z-index: 1000;
+}
+.alertWindowBtn {
+    display: inline-block;
+    margin-right: 16px;
+    width: 60px;
+    height: 30px;
+    line-height: 30px;
+    background-color: $sideBarBgColor;
+    text-align: center;
+    cursor: pointer;
 }

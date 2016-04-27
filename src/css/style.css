@@ -122,14 +122,46 @@ nav li {
   height: 200px;
 }
 
-#essential li {
+#essential {
+  overflow: auto;
+}
+
+#essential li, #attributes li {
   margin: 5px;
   font-size: 14px;
 }
 
-#essential p {
+#essential p, #attributes li > p {
   padding-left: 36px;
   font-size: 12px;
+}
+
+.theme {
+  display: inline-block;
+  border: 5px solid;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+}
+
+.theme.default {
+  border-color: #000000;
+  background-color: #F3FBD1;
+}
+
+.theme.wolf {
+  border-color: #FFFFFF;
+  background-color: #8C8282;
+}
+
+.theme.lion {
+  border-color: #F7F01B;
+  background-color: #8B1010;
+}
+
+.theme.crow {
+  border-color: #000000;
+  background-color: #000000;
 }
 
 #taskBar {
@@ -190,4 +222,15 @@ nav li {
 .alertWindowShader {
   position: absolute;
   z-index: 1000;
+}
+
+.alertWindowBtn {
+  display: inline-block;
+  margin-right: 16px;
+  width: 60px;
+  height: 30px;
+  line-height: 30px;
+  background-color: #F3FBD1;
+  text-align: center;
+  cursor: pointer;
 }
