@@ -82,7 +82,6 @@ nav li {
     @include fullHeight;
     top: 62px;
     left: 0;
-    border-right: 2px solid $black;
     width: 3 * $hundred;
     background-color: $sideBarBgColor;
 }
@@ -102,6 +101,8 @@ nav li {
     cursor: pointer;
 }
 .chooseBar>ul>li.currentChoose {
+    position: relative;
+    z-index: 9;
     border-bottom-color: $sideBarBgColor;
 }
 .chooseBar>div {
@@ -125,6 +126,15 @@ nav li {
 #essential p, #attributes li>p {
     padding-left: 36px;
     font-size: 12px;
+}
+#thumbnail {
+    position: relative;
+    z-index: 1;
+}
+#thumbnail>img {
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 .theme {
     display: inline-block;
@@ -153,7 +163,6 @@ nav li {
     @include fullHeight;
     left: 3 * $hundred;
     right: 0;
-    border: 2px solid $black;
     background-color: $taskBarBgColor;
     opacity: .8;
 }

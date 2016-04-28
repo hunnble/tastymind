@@ -322,6 +322,7 @@ TaskBar.prototype = {
                     }
                 }
             }
+            self.screenshot();
         });
         // 编辑
         addHandler(self.taskBar, 'keydown', function (e) {
@@ -415,14 +416,12 @@ TaskBar.prototype = {
                 }
             };
             self.tasks.push(desNode);
-
             counts = -1;
             for(j = 0; j <= i; ++j) {
                 if(self.tasks[j].parentIndex == -1) {
                     ++counts;
                 }
             }
-
             treeNode = document.createElement('p');
             treeNode.innerHTML = task.innerHTML;
             taskTree.querySelectorAll('li')[counts].appendChild(treeNode);
@@ -439,6 +438,7 @@ TaskBar.prototype = {
             treeNode.innerHTML = task.innerHTML;
             taskTree.appendChild(treeNode);
         }
+        self.screenshot();
     },
     // 编辑主题
     editTask: function (e) {
@@ -450,6 +450,7 @@ TaskBar.prototype = {
             addClassName(self.focusTask, 'focusTask');
             target.contentEditable = true;
             target.focus();
+            self.screenshot();
         }
     },
     // 删除主题
@@ -460,6 +461,7 @@ TaskBar.prototype = {
             treeNodes   = taskTree.querySelectorAll('li'),
             sonNodes    = [],
             parentIndex = -1,
+            treeNode,
             len,
             counts,
             i,
@@ -530,12 +532,33 @@ TaskBar.prototype = {
 
             // 子主题重定向
             for(j = 0, len = self.tasks.length; j < len; ++j) {
-                if(j >= i && self.tasks[j].parentIndex == parentIndex) {
+                if(parentIndex == -1 && self.tasks[j].parentIndex == i) {
                     self.tasks[j].parentIndex = -1;
-                } else if(self.tasks[j].parentIndex >= i) {
+                    treeNode = document.createElement('li');
+                    treeNode.innerHTML = self.tasks[j].node.innerHTML;
+                    taskTree.appendChild(treeNode);
+                } else if (self.tasks[j].parentIndex >= i) {
                     self.tasks[j].parentIndex -= 1;
+                    if(parentIndex == -1) {
+                        sonNodes.push(j);
+                    }
                 }
             }
+            sonNodes.forEach(function (sonNodeIndex) {
+                var parentIndex = findBasicTask(sonNodeIndex, self.tasks),
+                    counts = 0,
+                    sonNode = document.createElement('p'),
+                    i;
+
+                for(i = 0; i < parentIndex; ++i) {
+                    if(self.tasks[i].parentIndex == -1) {
+                        counts += 1;
+                    }
+                }
+                sonNode.innerHTML = self.tasks[sonNodeIndex].node.innerHTML;
+                taskTree.querySelectorAll('li')[counts].appendChild(sonNode);
+            });
+
             // DOM中删除
             target.parentNode.removeChild(target);
             // 重绘canvas
@@ -555,6 +578,8 @@ TaskBar.prototype = {
             }
             // focusTask初始化
             self.focusTask = null;
+
+            self.screenshot();
         }
     },
     // 绘制主题间的连线
@@ -603,6 +628,25 @@ TaskBar.prototype = {
         cxt.moveTo(lastX, lastY);
         cxt.bezierCurveTo((lastX+(1-ratio)*diff.x), (lastY+ratio*diff.y), (newX-ratio*diff.x), (newY-(1-ratio)*diff.y), newX, newY);
         cxt.stroke();
+    },
+    screenshot: function () {
+        var self = this,
+            thumbnail = document.querySelector('#thumbnail'),
+            taskBarCanvas = self.canvas,
+            img1,
+            img2;
+
+        html2canvas(self.taskBar, {
+            onrendered: function(canvas) {
+                thumbnail.innerHTML = '';
+                img1 = Canvas2Image.convertToImage(canvas, thumbnail.offsetWidth-2, thumbnail.offsetHeight-2, 'png');
+                // taskBarCanvas.getContext('2d').drawImage(img1, 0, 0);
+                img2 = Canvas2Image.convertToImage(taskBarCanvas, thumbnail.offsetWidth-2, thumbnail.offsetHeight-2, 'png');
+                thumbnail.appendChild(img1);
+                thumbnail.appendChild(img2);
+            }
+        });
+
     }
 };
 
