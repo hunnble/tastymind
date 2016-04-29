@@ -5,6 +5,7 @@ $white: #FFFFFF;
 $black: #000000;
 $sideBarBgColor: #F3FBD1;
 $taskBarBgColor: #F3FBD1;
+$focusColor: #23B0F7;
 
 @mixin fullHeight {
     position: absolute;
@@ -30,13 +31,13 @@ h1,h2,h3,h4,h5,h6 {
     font-weight: normal;
     font-size: 100%;
 }
-
 #contextmenu {
     display: none;
     position: absolute;
     border: 1px solid $black;
     width: $hundred;
     z-index: 100;
+    background-color: $white;
 }
 #contextmenu>p {
     line-height: $hundred / 4;
@@ -119,13 +120,20 @@ nav li {
 #essential {
     overflow: auto;
 }
-#essential li, #attributes li {
+#essential li {
     margin: 5px;
     font-size: 14px;
 }
-#essential p, #attributes li>p {
+#essential p {
     padding-left: 36px;
     font-size: 12px;
+}
+#attributes {
+    overflow: auto;
+    padding-left: 5px;
+}
+#attributes li>p {
+    font-size: 16px;
 }
 #thumbnail {
     position: relative;
@@ -146,39 +154,47 @@ nav li {
 .theme.default {
     border-color: $black;
     background-color: $taskBarBgColor;
+    color: $black;
 }
 .theme.wolf {
     border-color: $white;
     background-color: #8C8282;
+    color: $white;
 }
 .theme.lion {
     border-color: #F7F01B;
     background-color: #8B1010;
+    color: #F7F01B;
 }
 .theme.crow {
-    border-color: $black;
+    border-color: #1EF64E;
     background-color: $black;
+    color: #1EF64E;
 }
 #taskBar {
     @include fullHeight;
     left: 3 * $hundred;
     right: 0;
     background-color: $taskBarBgColor;
+    border-color: $black;
     opacity: .8;
 }
 .task {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
     position: absolute;
     border-radius: 5px;
+    border: 3px solid;
     width: $hundred;
     height: .4 * $hundred;
-    line-height: .4 * $hundred;
-    background-color: $black;
-    color: $white;
+    line-height: .4 * $hundred - 6px;
     text-align: center;
 }
 .focusTask {
     outline: none;
-    background-color: #F7E105;
+    border-color: $focusColor;
+    color: $focusColor;
 }
 #tmindCanvas {
     @include fullHeight;

@@ -211,3 +211,14 @@ function isPlain(obj) {
     }
     return true;
 };
+
+function getStyle(obj, prop) {
+    var fprop;
+    if(window.getComputedStyle) {
+        fprop = prop.replace(/([A-Z])/g, '-$1').toLowerCase();
+        return document.defaultView.getComputedStyle(obj, null)[fprop];
+    } else if (obj.currentStyle) {
+        return obj.currentStyle[prop];
+    }
+    return null;
+};

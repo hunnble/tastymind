@@ -39,24 +39,30 @@ Nav.prototype = {
             var target    = getTarget(e),
                 funcs     = self.options[0].querySelectorAll('p'),
                 taskTree  = self.taskBar.sideBar.sideBar.querySelector('#essential>ul'),
+                thumbnail = self.taskBar.sideBar.sideBar.querySelector('#thumbnail'),
                 tmindName = "tmind#name=",
                 tasks     = [];
 
             // 新建导图(清空)
             if(target == funcs[0]) {
+                if(self.taskBar.tasks.length > 0 && !self.taskBar.hasSaved && confirm('当前导图未储存,是否要储存?')) {
+                    funcs[2].click();
+                }
                 self.taskBar.tasks = [];
                 self.taskBar.taskBar.innerHTML = '';
                 self.taskBar.canvas.getContext('2d').clearRect(0, 0, self.taskBar.canvas.width, self.taskBar.canvas.height);
                 taskTree.innerHTML = '';
+                thumbnail.innerHTML = '';
                 self.taskBar.hasSaved = true;
             }
             // 打开导图
             else if (target == funcs[1]) {
-                if(self.taskBar.tasks && !self.taskBar.hasSaved && confirm('当前导图未储存,是否要储存?')) {
-                    funcs[2].click();
-                }
                 tmindName += prompt('请输入导图名称');
-                tasks     = JSON.parse(localStorage.getItem(tmindName));
+                if(!localStorage.getItem(tmindName)) {
+                    alert('导图不存在');
+                    return false;
+                }
+                tasks = JSON.parse(localStorage.getItem(tmindName));
                 funcs[0].click();
                 if(tasks.length > 0) {
                      self.taskBar.hasSaved = true;
@@ -74,13 +80,7 @@ Nav.prototype = {
             }
             // 保存
             else if(target == funcs[2]) {
-                // 可以用alertBar,先用prompt和confirm测试
-                tmindName += prompt('请输入导图名');
-                if(localStorage.getItem(tmindName) && !confirm('已有导图,是否覆盖?')) {
-                    return false;
-                }
-                self.taskBar.hasSaved = true;
-                localStorage.setItem(tmindName, JSON.stringify(self.taskBar.tasks));
+                self.taskBar.saveMind(tmindName);
             }
         });
 
@@ -165,10 +165,12 @@ var SideBar = function () {
 
 SideBar.prototype = {
     bindEvents: function () {
-        var self = this;
+        var self = this,
+            fontSize = self.sideBar.querySelector('#fontSize');
 
         addHandler(self.sideBar, 'click', function (e) {
             var target = getTarget(e),
+                themes = self.sideBar.querySelectorAll('.theme'),
                 lastChoosed,
                 chooseBar,
                 titles,
@@ -186,7 +188,18 @@ SideBar.prototype = {
                 removeClassName(lastChoosed[1], 'currentChoose');
                 addClassName(contents[index], 'currentChoose');
                 addClassName(target, 'currentChoose');
+                self.taskBar.screenshot();
+            } else if (hasClassName(target, 'theme')) {
+                self.taskBar.taskBar.style.backgroundColor = getStyle(target, 'backgroundColor');
+                self.taskBar.taskBar.style.color = getStyle(target, 'color');
+                self.taskBar.taskBar.style.borderColor = getStyle(target, 'color');
+                self.taskBar.screenshot();
             }
+        });
+
+        addHandler(fontSize, 'change', function () {
+            self.taskBar.taskBar.style.fontSize = fontSize.value;
+            self.taskBar.screenshot();
         });
     }
 };
@@ -257,6 +270,10 @@ TaskBar.prototype = {
             e = e || window.event;
             self.removeTask(e);
         });
+        // 保存
+        addHandler(self.contextmenu.options[3], 'click', function () {
+            self.saveMind();
+        });
         // 单击取消选择
         addHandler(self.taskBar, 'click', function (e) {
             var target = getTarget(e);
@@ -264,11 +281,13 @@ TaskBar.prototype = {
                 self.focusTask.contentEditable = false;
                 removeClassName(self.focusTask, 'focusTask');
                 self.focusTask = null;
+                self.screenshot();
             }
         });
         // 双击选中
         addHandler(self.taskBar, 'dblclick', function (e) {
             self.editTask(e);
+            self.screenshot();
         });
         // 拖拽开始
         addHandler(self.taskBar, 'dragstart', function (e) {
@@ -340,6 +359,9 @@ TaskBar.prototype = {
             if(target == self.focusTask) {
                 self.hasSaved = false;
                 if(e.keyCode == 13) {
+                    if(self.focusTask.innerHTML == '') {
+                        self.focusTask.innerHTML = '--';
+                    }
                     self.focusTask.contentEditable = false;
                     removeClassName(self.focusTask, 'focusTask');
                     self.focusTask = null;
@@ -376,6 +398,7 @@ TaskBar.prototype = {
                             break;
                         }
                     }
+                    self.screenshot();
                 }
             }
         });
@@ -562,20 +585,21 @@ TaskBar.prototype = {
             // DOM中删除
             target.parentNode.removeChild(target);
             // 重绘canvas
-            self.canvas.getContext('2d').clearRect(0, 0, self.canvas.width, self.canvas.height);
+            // self.canvas.getContext('2d').clearRect(0, 0, self.canvas.width, self.canvas.height);
             for(j = 0, len = self.tasks.length; j < len; ++j) {
                 if(self.tasks[j].parentIndex == i - 1) {
                     // 是已经删除的节点的子节点,就把父节点改成被删节点的父节点
                     self.tasks[j].parentIndex = parentIndex;
                 }
                 // 画线
-                if (self.tasks[j].parentIndex != -1) {
-                    self.drawBezierCurve({
-                        clientX: self.tasks[j].node.offsetLeft + self.tasks[j].node.offsetWidth / 2 + self.taskBar.offsetLeft,
-                        clientY: self.tasks[j].node.offsetTop + self.tasks[j].node.offsetHeight / 2 + self.taskBar.offsetTop
-                    }, self.ratio, self.tasks[self.tasks[j].parentIndex].node);
-                }
+                // if (self.tasks[j].parentIndex != -1) {
+                //     self.drawBezierCurve({
+                //         clientX: self.tasks[j].node.offsetLeft + self.tasks[j].node.offsetWidth / 2 + self.taskBar.offsetLeft,
+                //         clientY: self.tasks[j].node.offsetTop + self.tasks[j].node.offsetHeight / 2 + self.taskBar.offsetTop
+                //     }, self.ratio, self.tasks[self.tasks[j].parentIndex].node);
+                // }
             }
+            self.renderCanvas();
             // focusTask初始化
             self.focusTask = null;
 
@@ -629,6 +653,24 @@ TaskBar.prototype = {
         cxt.bezierCurveTo((lastX+(1-ratio)*diff.x), (lastY+ratio*diff.y), (newX-ratio*diff.x), (newY-(1-ratio)*diff.y), newX, newY);
         cxt.stroke();
     },
+    // 重绘canvas
+    renderCanvas: function () {
+        var self = this,
+            len,
+            j;
+
+        self.canvas.getContext('2d').clearRect(0, 0, self.canvas.width, self.canvas.height);
+        for(j = 0, len = self.tasks.length; j < len; ++j) {
+            // 画线
+            if (self.tasks[j].parentIndex != -1) {
+                self.drawBezierCurve({
+                    clientX: self.tasks[j].node.offsetLeft + self.tasks[j].node.offsetWidth / 2 + self.taskBar.offsetLeft,
+                    clientY: self.tasks[j].node.offsetTop + self.tasks[j].node.offsetHeight / 2 + self.taskBar.offsetTop
+                }, self.ratio, self.tasks[self.tasks[j].parentIndex].node);
+            }
+        }
+    },
+    // 用html2canvas和Canvas2Image截取略缩图
     screenshot: function () {
         var self = this,
             thumbnail = document.querySelector('#thumbnail'),
@@ -640,13 +682,24 @@ TaskBar.prototype = {
             onrendered: function(canvas) {
                 thumbnail.innerHTML = '';
                 img1 = Canvas2Image.convertToImage(canvas, thumbnail.offsetWidth-2, thumbnail.offsetHeight-2, 'png');
-                // taskBarCanvas.getContext('2d').drawImage(img1, 0, 0);
                 img2 = Canvas2Image.convertToImage(taskBarCanvas, thumbnail.offsetWidth-2, thumbnail.offsetHeight-2, 'png');
                 thumbnail.appendChild(img1);
                 thumbnail.appendChild(img2);
             }
         });
 
+    },
+    // 保存
+    saveMind: function (tmindName) {
+        var self = this,
+            name = prompt('请输入导图名');
+
+        if(!name || localStorage.getItem(tmindName) != undefined && !confirm('已有导图,是否覆盖?')) {
+            return false;
+        }
+        tmindName += name;
+        self.hasSaved = true;
+        localStorage.setItem(tmindName, JSON.stringify(self.tasks));
     }
 };
 

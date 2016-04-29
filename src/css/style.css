@@ -25,6 +25,7 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid #000000;
   width: 100px;
   z-index: 100;
+  background-color: #FFFFFF;
 }
 
 #contextmenu > p {
@@ -127,14 +128,23 @@ nav li {
   overflow: auto;
 }
 
-#essential li, #attributes li {
+#essential li {
   margin: 5px;
   font-size: 14px;
 }
 
-#essential p, #attributes li > p {
+#essential p {
   padding-left: 36px;
   font-size: 12px;
+}
+
+#attributes {
+  overflow: auto;
+  padding-left: 5px;
+}
+
+#attributes li > p {
+  font-size: 16px;
 }
 
 #thumbnail {
@@ -159,21 +169,25 @@ nav li {
 .theme.default {
   border-color: #000000;
   background-color: #F3FBD1;
+  color: #000000;
 }
 
 .theme.wolf {
   border-color: #FFFFFF;
   background-color: #8C8282;
+  color: #FFFFFF;
 }
 
 .theme.lion {
   border-color: #F7F01B;
   background-color: #8B1010;
+  color: #F7F01B;
 }
 
 .theme.crow {
-  border-color: #000000;
+  border-color: #1EF64E;
   background-color: #000000;
+  color: #1EF64E;
 }
 
 #taskBar {
@@ -184,23 +198,25 @@ nav li {
   left: 300px;
   right: 0;
   background-color: #F3FBD1;
+  border-color: #000000;
   opacity: .8;
 }
 
 .task {
+  box-sizing: border-box;
   position: absolute;
   border-radius: 5px;
+  border: 3px solid;
   width: 100px;
   height: 40px;
-  line-height: 40px;
-  background-color: #000000;
-  color: #FFFFFF;
+  line-height: 34px;
   text-align: center;
 }
 
 .focusTask {
   outline: none;
-  background-color: #F7E105;
+  border-color: #23B0F7;
+  color: #23B0F7;
 }
 
 #tmindCanvas {

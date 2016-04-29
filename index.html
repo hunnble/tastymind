@@ -53,9 +53,7 @@
             <div id="essential" class="currentChoose">
                 <ul></ul>
             </div>
-            <div id="thumbnail">
-                <p>浏览</p>
-            </div>
+            <div id="thumbnail"></div>
         </div>
         <div class="chooseBar">
             <ul>
@@ -69,7 +67,15 @@
                         <span class="theme default"></span>
                         <span class="theme wolf"></span>
                         <span class="theme lion"></span>
-                        <span class="theme crow"></span>
+                        <span class="theme crow"></span><br />
+                        <p>字体大小</p>
+                        <select id="fontSize">
+                            <option value="larger">大</option>
+                            <option value="medium" selected>中</option>
+                            <option value="smaller">小</option>
+                        </select>
+                        <span class="fontStyle"></span>
+                        <span class="fontStyle"></span>
                     </li>
                 </ul>
             </div>
@@ -82,9 +88,9 @@
         <div id="taskBar"></div>
         <canvas id="tmindCanvas"></canvas>
         <div id="contextmenu">
-            <p>创建子主题</p>
-            <p>编辑此主题</p>
-            <p>删除此主题</p>
+            <p>创建主题</p>
+            <p>编辑主题</p>
+            <p>删除主题</p>
             <p>保存</p>
         </div>
     </article>
