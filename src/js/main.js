@@ -393,7 +393,7 @@ TaskBar.prototype = {
                                     }
                                 }
                                 lastTxt = '<' + treeNodes[counts].innerHTML.split('<').slice(1).join('<');
-                                treeNodes[counts].innerHTML = target.innerHTML + lastTxt;
+                                treeNodes[counts].innerHTML = target.innerHTML + (lastTxt == '<' ? '' : lastTxt);
                             }
                             break;
                         }
@@ -485,6 +485,7 @@ TaskBar.prototype = {
             treeNodes   = taskTree.querySelectorAll('li'),
             sonNodes    = [],
             parentIndex = -1,
+            treeCount   = 0,
             treeNode,
             len,
             counts,
@@ -521,10 +522,10 @@ TaskBar.prototype = {
                         // 删掉的是没有父主题的主题
                         for(j = 0; j < i; ++j) {
                             if(self.tasks[j].parentIndex == -1) {
-                                ++counts;
+                                ++treeCount;
                             }
                         }
-                        taskTree.removeChild(treeNodes[counts]);
+                        taskTree.removeChild(treeNodes[treeCount]);
                     }
                     self.tasks.splice(i, 1);
                     break;
@@ -538,7 +539,7 @@ TaskBar.prototype = {
                     self.tasks[j].parentIndex = -1;
                     treeNode = document.createElement('li');
                     treeNode.innerHTML = self.tasks[j].node.innerHTML;
-                    taskTree.appendChild(treeNode);
+                    taskTree.insertBefore(treeNode, treeNodes[treeCount+1]);
                 } else if (parentIndex != -1 && self.tasks[j].parentIndex == i) {
                     // 被删除节点有父主题,找到的是被删除节点的直接子主题=>父主题变成被删除节点的父主题
                     self.tasks[j].parentIndex = parentIndex;
@@ -669,7 +670,7 @@ TaskBar.prototype = {
         var self = this,
             name = prompt('请输入导图名');
 
-        if(!name || localStorage.getItem(tmindName) != undefined && !confirm('已有导图,是否覆盖?')) {
+        if(!name || localStorage.getItem(tmindName) != 'undefined' && !confirm('已有导图,是否覆盖?')) {
             return false;
         }
         tmindName += name;
