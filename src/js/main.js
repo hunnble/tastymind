@@ -372,7 +372,7 @@ TaskBar.prototype = {
                             counts = 0;
                             parentIndex = self.tasks[i].parentIndex;
                             if(parentIndex != -1) {
-                                j = findBasicTask(i, self.tasks);
+                                j = findBasicTask(i, self.tasks).resultIndex;
                                 for(len = 0; len < i; ++len) {
                                     if(self.tasks[len].parentIndex != -1) {
                                         k = len;
@@ -384,7 +384,7 @@ TaskBar.prototype = {
                                         }
                                     }
                                 }
-                                k = findBasicTask(i, self.tasks);
+                                k = findBasicTask(i, self.tasks).resultIndex;
                                 treeNodes[k].querySelectorAll('p')[counts].innerHTML = target.innerHTML;
                             } else {
                                 for(j = 0; j < i; ++j) {
@@ -392,7 +392,7 @@ TaskBar.prototype = {
                                         ++counts;
                                     }
                                 }
-                                lastTxt = '<' + treeNodes[counts].innerHTML.split('<')[1];
+                                lastTxt = '<' + treeNodes[counts].innerHTML.split('<').slice(1).join('<');
                                 treeNodes[counts].innerHTML = target.innerHTML + lastTxt;
                             }
                             break;
@@ -412,6 +412,7 @@ TaskBar.prototype = {
             taskBarY = self.taskBar.offsetTop,
             taskTree = self.sideBar.sideBar.querySelector('#essential>ul'),
             treeNode,
+            parentIndex,
             i,
             j,
             counts;
@@ -439,8 +440,8 @@ TaskBar.prototype = {
                 }
             };
             self.tasks.push(desNode);
-            counts = -1;
-            for(j = 0; j <= i; ++j) {
+            parentIndex = findBasicTask(i, self.tasks).resultIndex;
+            for(counts = 0, j = 0; j < parentIndex; ++j) {
                 if(self.tasks[j].parentIndex == -1) {
                     ++counts;
                 }
@@ -499,56 +500,33 @@ TaskBar.prototype = {
                     counts = 0;
                     parentIndex = self.tasks[i].parentIndex;
                     if(parentIndex != -1) {
-
-                        // j = i;
-                        // while(self.tasks[j].parentIndex != -1) {
-                        //     j = self.tasks[j].parentIndex;
-                        // }
-                        j = findBasicTask(i, self.tasks);
+                        // 删掉的是有父主题的主题
+                        j = findBasicTask(i, self.tasks).resultIndex;
                         for(len = 0; len < i; ++len) {
                             if(self.tasks[len].parentIndex != -1) {
-                                k = len;
-                                while(self.tasks[k].parentIndex != -1) {
-                                    k = self.tasks[k].parentIndex;
-                                }
+                                k = findBasicTask(len, self.tasks).resultIndex;
                                 if(k == j) {
                                     ++counts;
                                 }
                             }
                         }
-                        for(len = -1, j = 0; j < i; ++j) {
+                        k = findBasicTask(i, self.tasks).resultIndex;
+                        for(len = 0, j = 0; j < k; ++j) {
                             if(self.tasks[j].parentIndex == -1) {
                                 ++len;
                             }
                         }
                         treeNodes[len].removeChild(treeNodes[len].querySelectorAll('p')[counts]);
                     } else {
+                        // 删掉的是没有父主题的主题
                         for(j = 0; j < i; ++j) {
                             if(self.tasks[j].parentIndex == -1) {
                                 ++counts;
                             }
                         }
-
                         taskTree.removeChild(treeNodes[counts]);
-
-                        // 删除taskBar和tasks中被删除节点的所有子节点
-                        // for(j = i + 1; j < len; ++j) {
-                        //     if(findBasicTask(j, self.tasks) == parentIndex) {
-                        //         ++counts;
-                        //     }
-                        // }
                     }
-
-                    // 子节点从DOM中和tasks中删除
-                    // for(j = i + 1; j < self.tasks.length; ++j) {
-                    //     if(findBasicTask(j, self.tasks) == findBasicTask(i, self.tasks)) {
-                    //         sonNodes.push(self.tasks[j]);
-                    //     }
-                    // }
                     self.tasks.splice(i, 1);
-                    // for(j = 0, len = sonNodes.length; j < sonNodes; ++j) {
-                    //     self.taskBar.removeChild(sonNodes[j]);
-                    // }
                     break;
                 }
             }
@@ -556,11 +534,16 @@ TaskBar.prototype = {
             // 子主题重定向
             for(j = 0, len = self.tasks.length; j < len; ++j) {
                 if(parentIndex == -1 && self.tasks[j].parentIndex == i) {
+                    // 被删除节点无父主题,找到的是被删除节点的直接子主题=>变成无父主题
                     self.tasks[j].parentIndex = -1;
                     treeNode = document.createElement('li');
                     treeNode.innerHTML = self.tasks[j].node.innerHTML;
                     taskTree.appendChild(treeNode);
+                } else if (parentIndex != -1 && self.tasks[j].parentIndex == i) {
+                    // 被删除节点有父主题,找到的是被删除节点的直接子主题=>父主题变成被删除节点的父主题
+                    self.tasks[j].parentIndex = parentIndex;
                 } else if (self.tasks[j].parentIndex >= i) {
+                    // 找到的是非直接子主题
                     self.tasks[j].parentIndex -= 1;
                     if(parentIndex == -1) {
                         sonNodes.push(j);
@@ -568,7 +551,7 @@ TaskBar.prototype = {
                 }
             }
             sonNodes.forEach(function (sonNodeIndex) {
-                var parentIndex = findBasicTask(sonNodeIndex, self.tasks),
+                var parentIndex = findBasicTask(sonNodeIndex, self.tasks).resultIndex,
                     counts = 0,
                     sonNode = document.createElement('p'),
                     i;
@@ -585,19 +568,11 @@ TaskBar.prototype = {
             // DOM中删除
             target.parentNode.removeChild(target);
             // 重绘canvas
-            // self.canvas.getContext('2d').clearRect(0, 0, self.canvas.width, self.canvas.height);
             for(j = 0, len = self.tasks.length; j < len; ++j) {
                 if(self.tasks[j].parentIndex == i - 1) {
                     // 是已经删除的节点的子节点,就把父节点改成被删节点的父节点
                     self.tasks[j].parentIndex = parentIndex;
                 }
-                // 画线
-                // if (self.tasks[j].parentIndex != -1) {
-                //     self.drawBezierCurve({
-                //         clientX: self.tasks[j].node.offsetLeft + self.tasks[j].node.offsetWidth / 2 + self.taskBar.offsetLeft,
-                //         clientY: self.tasks[j].node.offsetTop + self.tasks[j].node.offsetHeight / 2 + self.taskBar.offsetTop
-                //     }, self.ratio, self.tasks[self.tasks[j].parentIndex].node);
-                // }
             }
             self.renderCanvas();
             // focusTask初始化
