@@ -241,6 +241,7 @@ function TaskBar () {
     this.dragTask;
     this.focusTask;
     this.hasSaved    = true;
+    this.defaultWord = '';
 
     this.init();
     this.bindEvents();
@@ -278,6 +279,7 @@ TaskBar.prototype = {
         addHandler(self.taskBar, 'click', function (e) {
             var target = getTarget(e);
             if(self.focusTask && self.focusTask !== target) {
+                self.focusTask.innerHTML = self.defaultWord;
                 self.focusTask.contentEditable = false;
                 removeClassName(self.focusTask, 'focusTask');
                 self.focusTask = null;
@@ -471,10 +473,13 @@ TaskBar.prototype = {
 
         if(hasClassName(target, 'task')) {
             self.focusTask = target;
+            self.defaultWord = target.innerHTML;
             addClassName(self.focusTask, 'focusTask');
             target.contentEditable = true;
             target.focus();
             self.screenshot();
+        } else {
+            self.defaultWord = '';
         }
     },
     // 删除主题
@@ -599,26 +604,26 @@ TaskBar.prototype = {
             return;
         }
         if(diffX > taskWidth) {
-            newX -= taskWidth / 2;
+            newX  -= taskWidth / 2;
             lastX += taskWidth / 2;
         } else if (diffX < -1 * taskWidth) {
-            newX += taskWidth / 2;
+            newX  += taskWidth / 2;
             lastX -= taskWidth / 2;
         }
         if(diffY > taskHeight) {
-            newY -= taskHeight / 2;
+            newY  -= taskHeight / 2;
             lastY += taskHeight / 2;
         } else if (diffY < -1 * taskHeight) {
-            newY += taskHeight / 2;
+            newY  += taskHeight / 2;
             lastY -= taskHeight / 2;
         }
 
         var diff  = {
-                x: newX - lastX,
-                y: newY - lastY
-            },
-            // 起点到终点连线与水平线的夹角(弧度)
-            angle = Math.acos(diff.x / (Math.sqrt(Math.pow(diff.x)+Math.pow(diff.y))));
+            x: newX - lastX,
+            y: newY - lastY
+        };
+        // 起点到终点连线与水平线的夹角(弧度)
+        angle = Math.acos(diff.x / (Math.sqrt(Math.pow(diff.x)+Math.pow(diff.y))));
 
         cxt.strokeStyle = self.lineColor;
         cxt.fillStyle   = self.fillColor;
