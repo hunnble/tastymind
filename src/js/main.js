@@ -17,11 +17,19 @@ Nav.prototype = {
         addHandler(self.nav, 'click', function (e) {
             var target = getTarget(e);
 
+            // if(target.tagName.toLowerCase() == 'li') {
+            //     [].forEach.call(self.options, function (option) {
+            //         option.style.display = 'none';
+            //     });
+            //     target.querySelector('.options').style.display = 'block';
+            // }
+
             if(target.tagName.toLowerCase() == 'li') {
                 [].forEach.call(self.options, function (option) {
-                    option.style.display = 'none';
+                    // option.style.opacity = 0;
+                    removeClassName(option, 'show');
                 });
-                target.querySelector('.options').style.display = 'block';
+                addClassName(target.querySelector('.options'), 'show');
             }
         });
 
@@ -30,7 +38,7 @@ Nav.prototype = {
 
             if(target.tagName.toLowerCase() !== 'li') {
                 [].forEach.call(self.options, function (option) {
-                    option.style.display = 'none';
+                    removeClassName(option, 'show');
                 });
             }
         });
@@ -42,6 +50,10 @@ Nav.prototype = {
                 thumbnail = self.taskBar.sideBar.sideBar.querySelector('#thumbnail'),
                 tmindName = "tmind#name=",
                 tasks     = [];
+
+            if(!hasClassName(self.options[0], 'show')) {
+                return false;
+            }
 
             // 新建导图(清空)
             if(target == funcs[0]) {
@@ -87,24 +99,54 @@ Nav.prototype = {
         addHandler(self.options[1], 'click', function (e) {
             var target = getTarget(e),
                 funcs  = self.options[1].querySelectorAll('p');
+
+            if(!hasClassName(self.options[1], 'show')) {
+                return false;
+            }
         });
 
         addHandler(self.options[2], 'click', function (e) {
             var target = getTarget(e),
                 funcs  = self.options[2].querySelectorAll('p');
+
+            if(!hasClassName(self.options[2], 'show')) {
+                return false;
+            }
         });
 
         addHandler(self.options[3], 'click', function (e) {
-            var target = getTarget(e),
-                funcs  = self.options[3].querySelectorAll('p');
+            var target       = getTarget(e),
+                funcs        = self.options[3].querySelectorAll('p'),
+                offsetWidth  = self.taskBar.taskBar.offsetWidth - 2,
+                offsetHeight = self.taskBar.taskBar.offsetHeight - 2,
+                img1,
+                img2;
+
+            if(!hasClassName(self.options[3], 'show')) {
+                return false;
+            }
+
+            if(target == funcs[0]) {
+                html2canvas(self.taskBar.taskBar, {
+                    onrendered: function(canvas) {
+                        canvas.getContext('2d').drawImage(self.taskBar.canvas, 0, 0);
+                        img1 = Canvas2Image.saveAsPNG(canvas, offsetWidth, offsetHeight);
+                    }
+                });
+            }
         });
 
         addHandler(self.options[4], 'click', function (e) {
             var target = getTarget(e),
                 funcs  = self.options[4].querySelectorAll('p'),
-                AlertComp;
+                AlertComp,
+                config;
 
-            var config = {
+            if(!hasClassName(self.options[4], 'show')) {
+                return false;
+            }
+
+            config = {
                 titleTxt: '',
                 contentTxt: '',
                 hasShader: false,
@@ -130,12 +172,14 @@ Nav.prototype = {
             if(target == funcs[0]) {
                 config.titleTxt = 'tmind';
                 config.contentTxt = 'tasty mind,js开发的思维导图工具。';
-            } else if (target = funcs[1]) {
+            } else if (target == funcs[1]) {
                 config.titleTxt = '帮助';
-                config.contentTxt = '1.功能<br />2.技巧';
-            } else if (target = funcs[2]) {
+                config.contentTxt =
+                '1.<a href="#">功能</a><br />2.<a href="#">技巧</a>';
+            } else if (target == funcs[2]) {
                 config.titleTxt = '关于';
-                config.contentTxt = '作者: hunnble';
+                config.contentTxt =
+                '作者: hunnble<br /><a href="https://github.com/hunnble/tastymind">github</a>';
             }
 
             AlertComp = Hum.createClass(AlertBar, config);
@@ -150,7 +194,6 @@ Nav.prototype = {
                     console.log(AlertComp.returnValue);
                 });
             }
-
         });
     }
 }
@@ -166,7 +209,8 @@ var SideBar = function () {
 SideBar.prototype = {
     bindEvents: function () {
         var self = this,
-            fontSize = self.sideBar.querySelector('#fontSize');
+            fontSize = self.sideBar.querySelector('#fontSize'),
+            ligature = self.sideBar.querySelector('#ligature');
 
         addHandler(self.sideBar, 'click', function (e) {
             var target = getTarget(e),
@@ -201,13 +245,19 @@ SideBar.prototype = {
             self.taskBar.taskBar.style.fontSize = fontSize.value;
             self.taskBar.screenshot();
         });
+
+        addHandler(ligature, 'change', function () {
+            self.taskBar.ratio = ligature.value;
+            self.taskBar.renderCanvas();
+            self.taskBar.screenshot();
+        });
     }
 };
 
 // 右键菜单
 var Contextmenu = function () {
     this.contextmenu = document.querySelector('#contextmenu');
-    this.options = this.contextmenu.querySelectorAll('p');
+    this.options     = this.contextmenu.querySelectorAll('p');
 
     this.bindEvents();
 };

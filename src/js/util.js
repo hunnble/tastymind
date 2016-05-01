@@ -190,11 +190,16 @@ function dateDiff(date1, date2, delimiter) {
  * @return {Number}
  */
 function findBasicTask(index, tasks) {
-    var resultIndex = index;
+    var resultIndex = index,
+        depth = -1;
     while(tasks[resultIndex].parentIndex != -1) {
+        depth += 1;
         resultIndex = tasks[resultIndex].parentIndex;
     }
-    return resultIndex;
+    return {
+        resultIndex: resultIndex,
+        depth: depth
+    };
 };
 
 function isString(obj) {
@@ -222,3 +227,11 @@ function getStyle(obj, prop) {
     }
     return null;
 };
+
+if(typeof Object.create === 'undefined') {
+    Object.create = function (prototype) {
+        function C () {};
+        C.prototype = prototype;
+        return new C();
+    };
+}
