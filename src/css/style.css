@@ -204,7 +204,7 @@ nav li {
   right: 0;
   background-color: #F3FBD1;
   border-color: #000000;
-  opacity: .8;
+  opacity: .5;
 }
 
 .task {
@@ -212,10 +212,9 @@ nav li {
   position: absolute;
   border-radius: 5px;
   border: 3px solid;
-  width: 100px;
-  height: 40px;
   line-height: 34px;
   text-align: center;
+  word-wrap: break-word;
 }
 
 .focusTask {

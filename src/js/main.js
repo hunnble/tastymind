@@ -17,16 +17,8 @@ Nav.prototype = {
         addHandler(self.nav, 'click', function (e) {
             var target = getTarget(e);
 
-            // if(target.tagName.toLowerCase() == 'li') {
-            //     [].forEach.call(self.options, function (option) {
-            //         option.style.display = 'none';
-            //     });
-            //     target.querySelector('.options').style.display = 'block';
-            // }
-
             if(target.tagName.toLowerCase() == 'li') {
                 [].forEach.call(self.options, function (option) {
-                    // option.style.opacity = 0;
                     removeClassName(option, 'show');
                 });
                 addClassName(target.querySelector('.options'), 'show');
@@ -175,7 +167,7 @@ Nav.prototype = {
             } else if (target == funcs[1]) {
                 config.titleTxt = '帮助';
                 config.contentTxt =
-                '1.<a href="#">功能</a><br />2.<a href="#">技巧</a>';
+                '1.<a href="#">功能</a><br />快速创作思维导图，支持导出图片和主题切换。<br />2.<a href="#">技巧</a>';
             } else if (target == funcs[2]) {
                 config.titleTxt = '关于';
                 config.contentTxt =
@@ -284,7 +276,10 @@ function TaskBar () {
     this.canvas      = document.querySelector('#tmindCanvas');
     this.lineColor   = '#82ECA0';
     this.fillColor   = '#000000';
+    this.taskHeight  = 40;
+    this.taskWidth   = 100;
     this.ratio       = 0.8;
+    this.lineWidth   = 3;
     this.contextmenu = new Contextmenu();
     this.sideBar;
     this.tasks       = [];
@@ -469,13 +464,16 @@ TaskBar.prototype = {
             j,
             counts;
 
-        self.hasSaved = false;
+
+        self.hasSaved     = false;
+        task.draggable    = true;
+        task.style.width  = self.taskWidth + 'px';
+        task.style.top    = e.clientY - taskBarY - self.taskHeight / 2 + 'px';
+        task.style.left   = e.clientX - taskBarX - self.taskWidth / 2 + 'px';
+        task.innerHTML    = '主题' + (self.tasks.length + 1);
         addClassName(task, 'task');
-        task.draggable = true;
         self.taskBar.appendChild(task);
-        task.style.left = e.clientX - taskBarX - task.offsetWidth / 2 + 'px';
-        task.style.top  = e.clientY - taskBarY - task.offsetHeight / 2 + 'px';
-        task.innerHTML  = '主题' + (self.tasks.length + 1);
+
         if(self.focusTask) {
             for(i = 0; i < self.tasks.length; ++i) {
                 if(self.tasks[i].node == self.focusTask) {
@@ -677,10 +675,12 @@ TaskBar.prototype = {
 
         cxt.strokeStyle = self.lineColor;
         cxt.fillStyle   = self.fillColor;
-        cxt.lineWidth   = 5;
+        cxt.lineWidth   = self.lineWidth;
         cxt.globalCompositeOperation = 'source-over';
         cxt.beginPath();
         cxt.moveTo(lastX, lastY);
+        cxt.arc(lastX, lastY, 5, 0, Math.PI * 2, false);
+        cxt.fill();
         cxt.bezierCurveTo((lastX+(1-ratio)*diff.x), (lastY+ratio*diff.y), (newX-ratio*diff.x), (newY-(1-ratio)*diff.y), newX, newY);
         cxt.stroke();
     },

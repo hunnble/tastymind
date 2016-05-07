@@ -16,7 +16,7 @@ $focusColor: #23B0F7;
 
 html, body {
     font-size: 16px;
-    font-family: "SimHei", Arial;
+    font-family: "Microsoft YaHei", Arial;
     height: 100%;
 }
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,
@@ -52,7 +52,10 @@ header {
     height: $headerHeight;
 }
 nav {
-    border-top: 2px solid $black;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+    border: 1px solid $black;
     height: $navHeight;
 }
 nav>ul {
@@ -67,24 +70,27 @@ nav li {
     cursor: pointer;
 }
 .options {
-    position: relative;
+    overflow: hidden;
     display: none;
+    position: relative;
     z-index: 999;
+}
+.show {
+    display: block;
 }
 .options p {
     border: 1px solid $black;
     border-top: 0;
-    margin-left: 10%;
-    width: 80%;
     background-color: $white;
     line-height: 30px;
 }
 #sideBar {
     @include fullHeight;
-    top: 62px;
+    top: 82px;
     left: 0;
     width: 3 * $hundred;
     background-color: $sideBarBgColor;
+    font-size: 14px;
 }
 .chooseBar {
     margin: 10px auto;
@@ -177,7 +183,7 @@ nav li {
     right: 0;
     background-color: $taskBarBgColor;
     border-color: $black;
-    opacity: .8;
+    opacity: .5;
 }
 .task {
     -webkit-box-sizing: border-box;
@@ -186,10 +192,9 @@ nav li {
     position: absolute;
     border-radius: 5px;
     border: 3px solid;
-    width: $hundred;
-    height: .4 * $hundred;
     line-height: .4 * $hundred - 6px;
     text-align: center;
+    word-wrap: break-word;
 }
 .focusTask {
     outline: none;
